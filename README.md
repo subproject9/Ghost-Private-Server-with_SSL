@@ -40,7 +40,7 @@ This script will install and configure your Ghost blog.
 1.  **Clone the Repository**
     Clone this repository to your Ubuntu server:
     ```bash
-    git clone [https://github.com/subproject9/Ghost-Private-Server-with_SSL](https://github.com/subproject9/Ghost-Private-Server-with_SSL)
+    git clone https://github.com/subproject9/Ghost-Private-Server-with_SSL
     cd Ghost-Private-Server-with_SSL
     ```
 
