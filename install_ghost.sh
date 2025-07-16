@@ -108,15 +108,31 @@ run_with_spinner "Updating system packages..." "apt-get update"
 run_with_spinner "Upgrading system packages..." "apt-get upgrade -y"
 run_with_spinner "Installing dependencies (Nginx, MySQL, etc.)..." "apt-get install -y nginx curl mysql-server software-properties-common"
 
-# --- Interactive MySQL Hardening ---
-echo -e "\n${YELLOW}--- Securing MySQL Installation ---${NC}"
-echo "You will now be prompted to secure your MySQL installation."
-echo "It is highly recommended to set a root password."
-echo "Press 'Y' for the 'VALIDATE PASSWORD component'."
-echo "Choose a password strength (e.g., 2 for strong)."
-echo -e "Remember the password you set. You will need it in the next step.${NC}"
-sleep 5
-sudo mysql_secure_installation
+# --- Set MySQL Root Password ---
+echo -e "\n${YELLOW}--- Securing MySQL & Setting Root Password ---${NC}"
+echo "The script will now set a password for the MySQL 'root' user."
+echo "This is required for the Ghost installer to work correctly."
+echo -e "Please create a strong password and remember it.${NC}"
+
+while true; do
+    read -sp "Enter new MySQL root password: " MYSQL_ROOT_PASSWORD
+    echo
+    read -sp "Confirm new MySQL root password: " MYSQL_ROOT_PASSWORD_CONFIRM
+    echo
+    if [ "$MYSQL_ROOT_PASSWORD" = "$MYSQL_ROOT_PASSWORD_CONFIRM" ]; then
+        if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
+            echo -e "${YELLOW}Password cannot be empty. Please try again.${NC}"
+        else
+            break
+        fi
+    else
+        echo -e "${YELLOW}Passwords do not match. Please try again.${NC}"
+    fi
+done
+
+# This command changes the root user to use password authentication instead of auth_socket
+run_with_spinner "Setting MySQL root password..." "sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH 'mysql_native_password' BY '${MYSQL_ROOT_PASSWORD}'; FLUSH PRIVILEGES;\""
+run_with_spinner "Hardening MySQL installation..." "sudo mysql -e \"DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.db WHERE Db='test' OR Db='test\\\\_%'; FLUSH PRIVILEGES;\""
 
 run_with_spinner "Configuring firewall (UFW)..." "ufw allow ssh > /dev/null && ufw allow 'Nginx Full' > /dev/null && echo 'y' | ufw enable > /dev/null"
 
