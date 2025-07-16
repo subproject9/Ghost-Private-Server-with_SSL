@@ -132,7 +132,8 @@ done
 
 # This command changes the root user to use password authentication instead of auth_socket
 run_with_spinner "Setting MySQL root password..." "sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH 'mysql_native_password' BY '${MYSQL_ROOT_PASSWORD}'; FLUSH PRIVILEGES;\""
-run_with_spinner "Hardening MySQL installation..." "sudo mysql -e \"DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.db WHERE Db='test' OR Db='test\\\\_%'; FLUSH PRIVILEGES;\""
+# This command uses the new password to connect and finish hardening the installation.
+run_with_spinner "Hardening MySQL installation..." "mysql -u root -p'${MYSQL_ROOT_PASSWORD}' -e \"DELETE FROM mysql.user WHERE User=''; DELETE FROM mysql.db WHERE Db='test' OR Db='test\\\\_%'; FLUSH PRIVILEGES;\""
 
 run_with_spinner "Configuring firewall (UFW)..." "ufw allow ssh > /dev/null && ufw allow 'Nginx Full' > /dev/null && echo 'y' | ufw enable > /dev/null"
 
