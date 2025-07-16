@@ -1,6 +1,3 @@
-# Ghost-Private-Server-with_SSL
-Script installs and configures SSL using Cloudflare DNS verification on Ubuntu 24.04
-
 # Ghost Blog Installation & Backup Scripts for Ubuntu
 
 This repository contains a set of scripts to automate the installation and backup of a Ghost blog on an Ubuntu 24.04 server. The installation script is designed for a server that is not publicly accessible and uses Cloudflare's DNS for Let's Encrypt SSL certificate verification.
@@ -11,9 +8,9 @@ It follows security best practices by creating a non-root user for Ghost, harden
 
 * **Automated Ghost Installation**: Installs Ghost, Nginx, and MySQL.
 * **Secure SSL**: Uses Certbot with the Cloudflare DNS-01 challenge to get a valid SSL certificate without exposing the server to the internet.
-* **System Hardening**: Configures the UFW firewall and runs a basic MySQL hardening script.
+* **System Hardening**: Configures the UFW firewall and **locks down the MySQL server** by removing insecure defaults.
 * **Automated Backups**: Includes a separate script to back up your Ghost database and content files.
-* **User-Friendly**: The installation script prompts for all necessary information.
+* **User-Friendly**: The installation script prompts for all necessary information and provides an animated progress indicator.
 
 ---
 
@@ -59,12 +56,16 @@ This script will install and configure your Ghost blog.
     ```
 
 4.  **Follow the Prompts**
-    The script will ask you for:
-    * Your blog's domain name (e.g., `blog.yourdomain.com`).
-    * Your email address (for SSL certificate renewal notices).
-    * Your Cloudflare API Token (paste it when prompted).
+    The script will first ask for your domain name, email, and Cloudflare API token. After the automated steps, it will run the interactive Ghost installer.
 
-The script will handle the rest. Once it's finished, it will display the URL for your blog and your Ghost admin panel.
+    **When the Ghost installer prompts for MySQL information, use the following:**
+
+    * **MySQL Hostname:** Press **Enter** (to accept the default `localhost`).
+    * **MySQL Username:** Enter `root`.
+    * **MySQL Password:** Leave this **blank** and press **Enter**.
+    * **Ghost Database Name:** Press **Enter** (to accept the suggested name).
+
+The script will then complete the installation and configuration. Once it's finished, it will display the URL for your blog and your Ghost admin panel.
 
 ---
 
@@ -114,6 +115,7 @@ It is critical to have regular backups of your site. This script backs up your G
 ### Restoring from a Backup
 
 To restore your site, you would:
+
 1.  Install a fresh instance of Ghost.
 2.  Restore the database: `mysql -u root -p your_ghost_db < /path/to/db-backup-YYYY-MM-DD_HHMM.sql`
 3.  Restore the content files: `tar -xzf /path/to/content-backup-YYYY-MM-DD_HHMM.tar.gz -C /var/www/your_domain/`
@@ -127,6 +129,7 @@ For the best long-term experience, consider the following steps after installati
 ### Configure Transactional Email
 
 To ensure reliable email delivery for newsletters and password resets, configure a dedicated email service like Mailgun or SendGrid.
+
 1.  Log in as your Ghost user: `su - <your_ghost_user>`
 2.  Navigate to your install directory: `cd /var/www/your_domain`
 3.  Run the mail configuration tool: `ghost config mail` and follow the prompts.
@@ -142,4 +145,4 @@ To ensure reliable email delivery for newsletters and password resets, configure
     ```bash
     sudo apt update
     sudo apt upgrade -y
-    ````
+    ```
