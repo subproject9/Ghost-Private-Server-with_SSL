@@ -8,7 +8,7 @@ It follows security best practices by creating a non-root user for Ghost, harden
 
 * **Automated Ghost Installation**: Installs Ghost, Nginx, and MySQL.
 * **Secure SSL**: Uses Certbot with the Cloudflare DNS-01 challenge to get a valid SSL certificate without exposing the server to the internet.
-* **System Hardening**: Configures the UFW firewall and **locks down the MySQL server** by removing insecure defaults.
+* **System Hardening**: Configures the UFW firewall and **locks down the MySQL server** by having you set a root password.
 * **Automated Backups**: Includes a separate script to back up your Ghost database and content files.
 * **User-Friendly**: The installation script prompts for all necessary information and provides an animated progress indicator.
 
@@ -40,7 +40,7 @@ This script will install and configure your Ghost blog.
 1.  **Clone the Repository**
     Clone this repository to your Ubuntu server:
     ```bash
-    git clone https://github.com/subproject9/Ghost-Private-Server-with_SSL
+    git clone [https://github.com/subproject9/Ghost-Private-Server-with_SSL](https://github.com/subproject9/Ghost-Private-Server-with_SSL)
     cd Ghost-Private-Server-with_SSL
     ```
 
@@ -56,13 +56,18 @@ This script will install and configure your Ghost blog.
     ```
 
 4.  **Follow the Prompts**
-    The script will first ask for your domain name, email, and Cloudflare API token. After the automated steps, it will run the interactive Ghost installer.
+    The script will first ask for your domain name, email, and Cloudflare API token.
 
-    **When the Ghost installer prompts for MySQL information, use the following:**
+    **Securing MySQL:**
+    Partway through, the script will launch the interactive `mysql_secure_installation` utility.
+    * You will be asked to set a **root password** for MySQL. Choose a strong password and **remember it**, as you will need it in the next step.
+    * It is recommended to answer 'Y' (yes) to all subsequent security questions.
 
+    **Ghost Installer Prompts:**
+    After the automated steps, the script will run the interactive Ghost installer. When it prompts for MySQL information, use the following:
     * **MySQL Hostname:** Press **Enter** (to accept the default `localhost`).
     * **MySQL Username:** Enter `root`.
-    * **MySQL Password:** Leave this **blank** and press **Enter**.
+    * **MySQL Password:** Enter the **MySQL root password you just created**.
     * **Ghost Database Name:** Press **Enter** (to accept the suggested name).
 
 The script will then complete the installation and configuration. Once it's finished, it will display the URL for your blog and your Ghost admin panel.
@@ -129,7 +134,6 @@ For the best long-term experience, consider the following steps after installati
 ### Configure Transactional Email
 
 To ensure reliable email delivery for newsletters and password resets, configure a dedicated email service like Mailgun or SendGrid.
-
 1.  Log in as your Ghost user: `su - <your_ghost_user>`
 2.  Navigate to your install directory: `cd /var/www/your_domain`
 3.  Run the mail configuration tool: `ghost config mail` and follow the prompts.
