@@ -98,6 +98,19 @@ if [ -z "$DOMAIN_NAME" ] || [ -z "$EMAIL_ADDRESS" ] || [ -z "$CF_API_TOKEN" ]; t
   exit 1
 fi
 
+# --- Ask for subfolder installation ---
+BLOG_URL="https://${DOMAIN_NAME}"
+read -p "Do you want to install Ghost in a subfolder (e.g., ${BLOG_URL}/blog)? [y/N]: " INSTALL_IN_SUBFOLDER
+
+if [[ "$INSTALL_IN_SUBFOLDER" =~ ^[Yy]$ ]]; then
+    read -p "Enter the subfolder name (e.g., blog): " SUBFOLDER_NAME
+    # Remove leading/trailing slashes if user adds them
+    SUBFOLDER_NAME=$(echo "$SUBFOLDER_NAME" | sed 's:/*$::' | sed 's:^/*::')
+    if [ -n "$SUBFOLDER_NAME" ]; then
+        BLOG_URL="${BLOG_URL}/${SUBFOLDER_NAME}"
+    fi
+fi
+
 GHOST_INSTALL_DIR="/var/www/${DOMAIN_NAME}"
 
 # =============================================================================
@@ -156,7 +169,7 @@ sleep 3
 
 # The Ghost installer is interactive and provides its own progress, so we run it directly.
 su - "$SUDO_USER" -c "cd $GHOST_INSTALL_DIR && ghost install \
---url \"https://${DOMAIN_NAME}\" \
+--url \"${BLOG_URL}\" \
 --db mysql \
 --process systemd \
 --stack \
@@ -196,8 +209,8 @@ clear
 echo -e "${GREEN}✅ Success! Ghost has been installed and secured.${NC}"
 echo ""
 echo "---------------------------------------------------------"
-echo -e "Your blog is now running at: ${YELLOW}https://"$DOMAIN_NAME"${NC}"
-echo -e "Access your Ghost admin panel at: ${YELLOW}https://"$DOMAIN_NAME"/ghost/${NC}"
+echo -e "Your blog is now running at: ${YELLOW}${BLOG_URL}${NC}"
+echo -e "Access your Ghost admin panel at: ${YELLOW}${BLOG_URL}/ghost/${NC}"
 echo -e "The UFW firewall is active and your MySQL installation is hardened."
 echo "---------------------------------------------------------"
 echo ""
