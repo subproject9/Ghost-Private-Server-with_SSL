@@ -98,12 +98,12 @@ if [ -z "$DOMAIN_NAME" ] || [ -z "$EMAIL_ADDRESS" ] || [ -z "$CF_API_TOKEN" ]; t
   exit 1
 fi
 
-# --- Ask for subfolder installation ---
+# --- Ask for installation path ---
 BLOG_URL="https://${DOMAIN_NAME}"
-read -p "Do you want to install Ghost in a subfolder (e.g., ${BLOG_URL}/blog)? [y/N]: " INSTALL_IN_SUBFOLDER
+read -p "Do you want to install Ghost at the root of your domain (${BLOG_URL})? [Y/n]: " INSTALL_IN_ROOT
 
-if [[ "$INSTALL_IN_SUBFOLDER" =~ ^[Yy]$ ]]; then
-    read -p "Enter the subfolder name (e.g., blog): " SUBFOLDER_NAME
+if [[ "$INSTALL_IN_ROOT" =~ ^[Nn]$ ]]; then
+    read -p "Enter the directory name to install into (e.g., blog): " SUBFOLDER_NAME
     # Remove leading/trailing slashes if user adds them
     SUBFOLDER_NAME=$(echo "$SUBFOLDER_NAME" | sed 's:/*$::' | sed 's:^/*::')
     if [ -n "$SUBFOLDER_NAME" ]; then
